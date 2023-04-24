@@ -4,10 +4,7 @@ package com.partyh.finder.common.validators.commons;
 import com.partyh.finder.common.exception.impl.PFValidationException;
 import org.springframework.http.HttpMethod;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,6 +48,17 @@ public abstract class AbstractValidator<DTO> {
         LinkedHashMap<String, String> errors = new LinkedHashMap<>();
         errors.putAll(validateId(id, method, errors));
         throwExceptionIfNecessary(errors);
+    }
+
+    /**
+     *  Method to throw a ValidationException if the LinkedHashMap<String, String> is not empty
+     *  @param errors the LinkedHashMap<String, String> of errors
+     * @throws PFValidationException if the LinkedHashMap<String, String> is not empty
+     * */
+    protected void throwExceptionIfNecessary(LinkedHashMap <String, String> errors){
+        if (!errors.isEmpty()){
+            throw new PFValidationException("Validation Error", errors);
+        }
     }
 
     /**
@@ -131,25 +139,15 @@ public abstract class AbstractValidator<DTO> {
      *
      *@return a LinkedHashMap<String, String> with the errors found
      * */
-    protected LinkedHashMap<String, String> validateMandatoryFields( LinkedHashMap <String, String> errors, String ... fields){
-        for (String field : fields){
-            if (field == null || field.isEmpty()){
-                errors.put(field, field  + " is mandatory");
+    protected LinkedHashMap<String, String> validateMandatoryFields(LinkedHashMap <String, String> errors, List<String> mandatoryFieldsName , String ... fields){
+        for (int i = 0; i < fields.length; i++){
+            if (fields[i] == null || fields[i].isEmpty()){
+                errors.put(mandatoryFieldsName.get(i), mandatoryFieldsName.get(i) + " is mandatory");
             }
         }
         return errors;
     }
 
-    /**
-     *  Method to throw a ValidationException if the LinkedHashMap<String, String> is not empty
-     *  @param errors the LinkedHashMap<String, String> of errors
-     * @throws PFValidationException if the LinkedHashMap<String, String> is not empty
-     * */
-    protected void throwExceptionIfNecessary(LinkedHashMap <String, String> errors){
-        if (!errors.isEmpty()){
-            throw new PFValidationException("Validation Error", errors);
-        }
-    }
 
     /**
      * Method to validate the presence of optional objects
@@ -179,4 +177,5 @@ public abstract class AbstractValidator<DTO> {
         }
         return errors;
     }
+
 }

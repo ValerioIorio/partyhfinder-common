@@ -4,6 +4,7 @@ package com.partyh.finder.common.config.handler;
 import com.partyh.finder.common.exception.PFException;
 import com.partyh.finder.common.exception.ResponseError;
 
+import com.partyh.finder.common.exception.impl.PFNotFoundException;
 import com.partyh.finder.common.utils.ExceptionsUtil;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.MappingException;
@@ -42,11 +43,21 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = PFException.class)
     @ResponseBody
-    public ResponseEntity<ResponseError> handleValidationException(PFException e) {
+    public ResponseEntity<ResponseError> handlePfException(PFException e) {
         ExceptionsUtil.logExceptions(log, e);
         return new ResponseEntity<>(
                 new ResponseError(e, HttpStatus.BAD_REQUEST, e.getDetails()),
                 HttpStatus.BAD_REQUEST
+        );
+    }
+
+    @ExceptionHandler(value = PFNotFoundException.class)
+    @ResponseBody
+    public ResponseEntity<ResponseError> handlePfNotFoundException(PFNotFoundException e) {
+        ExceptionsUtil.logExceptions(log, e);
+        return new ResponseEntity<>(
+                new ResponseError(e, HttpStatus.NOT_FOUND, e.getDetails()),
+                HttpStatus.NOT_FOUND
         );
     }
 
